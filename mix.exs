@@ -16,9 +16,9 @@ defmodule NervesAutoconfTest.MixProject do
       deps: deps(),
       releases: [{@app, release()}],
       preferred_cli_target: [run: :host, test: :host],
-      compilers: [:elixir_make] ++ Mix.compilers,
+      compilers: [:elixir_make] ++ Mix.compilers(),
       aliases: [
-        compile: [&autoreconf/1, &configure/1, "compile", &install/1],
+        compile: [&autoreconf/1, &configure/1, "clean", "compile", &install/1],
         clean: [&autoreconf/1, &configure/1, "clean"]
       ],
       make_clean: ["clean"]
@@ -75,7 +75,13 @@ defmodule NervesAutoconfTest.MixProject do
   end
 
   defp configure(_args) do
-    System.cmd("#{File.cwd!()}/configure", ["--prefix=#{Mix.Project.app_path()}/priv"])
+    arch = System.get_env("REBAR_TARGET_ARCH")
+    options = if is_nil(arch), do: [], else: ["--target=#{arch}", "--host=#{arch}"]
+
+    System.cmd(
+      "#{File.cwd!()}/configure",
+      ["--prefix=#{Mix.Project.app_path()}/priv"] ++ options
+    )
   end
 
   defp install(_args) do
