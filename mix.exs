@@ -21,7 +21,8 @@ defmodule NervesAutoconfTest.MixProject do
         compile: [&autoreconf/1, &configure/1, "clean", "compile", &install/1],
         clean: [&autoreconf/1, &configure/1, "clean"]
       ],
-      make_clean: ["clean"]
+      make_clean: ["clean"],
+      make_args: ["-j#{:erlang.system_info(:logical_processors_available)}"]
     ]
   end
 
@@ -79,17 +80,17 @@ defmodule NervesAutoconfTest.MixProject do
     if is_nil(host) do
       System.cmd(
         "#{File.cwd!()}/configure",
-        ["--prefix=#{Mix.Project.app_path()}/priv"]
+        []
       )
     else
       System.cmd(
         "#{File.cwd!()}/configure",
-        ["--prefix=#{Mix.Project.app_path()}/priv", "--host=#{host}"]
+        ["--host=#{host}"]
       )
     end      
   end
 
   defp install(_args) do
-    System.cmd("make", ["install"])
+    File.cp_r("build", "#{Mix.Project.app_path()}/priv")
   end
 end
