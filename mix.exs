@@ -75,10 +75,18 @@ defmodule NervesAutoconfTest.MixProject do
   end
 
   defp configure(_args) do
-    System.cmd(
-      "#{File.cwd!()}/configure",
-      ["--prefix=#{Mix.Project.app_path()}/priv"]
-    )
+    host = System.get_env("REBAR_TARGET_ARCH")
+    if is_nil(host) do
+      System.cmd(
+        "#{File.cwd!()}/configure",
+        ["--prefix=#{Mix.Project.app_path()}/priv"]
+      )
+    else
+      System.cmd(
+        "#{File.cwd!()}/configure",
+        ["--prefix=#{Mix.Project.app_path()}/priv", "--host=#{host}"]
+      )
+    end      
   end
 
   defp install(_args) do
