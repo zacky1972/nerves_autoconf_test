@@ -18,7 +18,7 @@ defmodule NervesAutoconfTest.MixProject do
       preferred_cli_target: [run: :host, test: :host],
       compilers: [:elixir_make] ++ Mix.compilers(),
       aliases: [
-        compile: [&autoreconf/1, &configure/1, "clean", "compile", &install/1],
+        compile: [&autoreconf/1, &configure/1, "clean", &install/1, "compile"],
         clean: [&autoreconf/1, &configure/1, "clean"]
       ],
       make_clean: ["clean"],
@@ -80,17 +80,17 @@ defmodule NervesAutoconfTest.MixProject do
     if is_nil(host) do
       System.cmd(
         "#{File.cwd!()}/configure",
-        []
+        ["--prefix=#{Mix.Project.app_path()}/priv"]
       )
     else
       System.cmd(
         "#{File.cwd!()}/configure",
-        ["--host=#{host}"]
+        ["--prefix=#{Mix.Project.app_path()}/priv", "--host=#{host}"]
       )
     end      
   end
 
   defp install(_args) do
-    File.cp_r("build", "#{Mix.Project.app_path()}/priv")
+    System.cmd("make", ["install"])
   end
 end
