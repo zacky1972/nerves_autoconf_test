@@ -9,7 +9,6 @@ defmodule NervesAutoconfTest do
 
   def load_nif do
     nif_file = '#{Application.app_dir(:nerves_autoconf_test, "priv/lib/libnif")}'
-    # nif_file = 'priv/.libs/libnif'
 
     case :erlang.load_nif(nif_file, 0) do
       :ok -> :ok
